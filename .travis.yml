@@ -1,0 +1,18 @@
+laguage: go
+
+go:
+  - 1.8
+  - 1.9
+
+before_install:
+  - mkdir -p $GOPATH/src/github.com/stone-payments/rumpel
+  - git clone https://github.com/stone-payments/rumpel.git $GOPATH/src/github.com/stone-payments/rumpel
+  - cd $GOPATH/src/github.com/stone-payments/rumpel
+
+install:
+  - go get -v -u github.com/mattn/goveralls
+
+script:
+  - make deps
+  - make
+  - goveralls -coverprofile=coverage-all.out -service travis-ci -repotoken $COVERALLS_TOKEN
