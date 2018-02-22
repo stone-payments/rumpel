@@ -11,17 +11,24 @@
 ### Building
 
 ```sh
-> make deps
 > make
 ```
-
-> :warning: Case $GOPATH/bin not setted at $PATH please before execute below command
-
+> Using `go get` :tada:
 ```sh
-> export PATH=$PATH:$GOPATH/bin
+> go get -u -v github.com/stone-payments/rumpel/cmd/rumpel
 ```
+
 ### Executing
 
 ```sh
-> rumpel
+> rumpel --help
+
+Usage of rumpel:
+  -port string
+    	parameter for set application port (default ":28080")
+  -rules string
+    	parameter for rule configurations (default ".rumpel.yaml")
+2018/02/22 17:00:43 
+Cannot read environment, reason: flag: help requested
+
 ```
