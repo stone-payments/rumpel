@@ -1,0 +1,18 @@
+# Example of rule configuration file
+
+# ---
+# - name: A
+#   url: a.com.br/splits/publish
+#   claims:
+#   - host: origin.a.com.br
+#     path: /ab
+#     method: PUT
+#   - path: /a
+
+# - name: B
+#   url: b.com.br/splits
+#   timeout: 1
+#   claims:
+#   - path: /b
+#     method: POST
+#     headers:
