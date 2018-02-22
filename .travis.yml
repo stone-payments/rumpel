@@ -1,18 +1,42 @@
-laguage: go
+language: go
 
+# Only the last two Go releases are supported by the Go team with security
+# updates. Any versions older than that should be considered deprecated.
+# Don't bother testing with them. tip builds your code with the latest
+# development version of Go. This can warn you that your code will break
+# in the next version of Go. Don't worry! Later we declare that test runs
+# are allowed to fail on Go tip.
 go:
-  - 1.8
   - 1.9
+  - master 
 
-before_install:
-  - mkdir -p $GOPATH/src/github.com/stone-payments/rumpel
-  - git clone https://github.com/stone-payments/rumpel.git $GOPATH/src/github.com/stone-payments/rumpel
-  - cd $GOPATH/src/github.com/stone-payments/rumpel
+# Skip the install step. Don't `go get` dependencies. Only build with the
+# code in vendor/
+install: false
 
-install:
+matrix:
+  # It's ok if our code fails on unstable development versions of Go.
+  allow_failures:
+    - go: master
+
+  # Don't wait for tip tests to finish. Mark the test run green if the
+  # tests pass on the stable versions of Go.
+  fast_finish: true
+
+# Do email me the results of the test runs.
+notifications:
+  email:
+    on_success: never
+    on_failure: change
+
+# Anything in before_script that returns a nonzero exit code will
+# flunk the build and immediately stop. It's sorta like having
+# set -e enabled in bash. 
+before_script:  
   - go get -v -u github.com/mattn/goveralls
 
+# script always run to completion (set +e). All of these code checks are must haves
+# in a modern Go project.
 script:
-  - make deps
   - make
   - goveralls -coverprofile=coverage-all.out -service travis-ci -repotoken $COVERALLS_TOKEN
