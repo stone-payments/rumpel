@@ -1,10 +1,7 @@
 package rule
 
 import (
-	"bytes"
-	"encoding/json"
-	"io"
-	"log"
+	"fmt"
 	"net/http"
 	"net/url"
 	"time"
@@ -14,87 +11,49 @@ import (
 
 func (rls Rules) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	claim := newClaim(r.Host, r.URL.EscapedPath(), r.Method, r.Header)
-	rl := getMatchRuleByClaim(rls, claim)
-	if rl == nil {
-		httpErr := &ErrRuleNotFound{StatusCode: http.StatusNotFound, Message: "not could match the rule"}
-		responseJSON(w, httpErr.StatusCode, httpErr)
+	rl, err := getMatchRuleByClaim(rls, claim)
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
 		return
+	}
+
+	u := rl.URL
+	if !rl.AbsolutePath {
+		u = fmt.Sprintf("%v%v", rl.URL, r.URL.Path)
 	}
 
 	pr := &proxy.Request{
 		Method:  r.Method,
-		URL:     rl.URL,
+		URL:     u,
 		Header:  r.Header,
 		Body:    r.Body,
 		Timeout: time.Duration(rl.Timeout),
 	}
-	err := proxy.Do(w, pr)
-	if err != nil {
+	if err = proxy.Do(w, pr); err != nil {
 		if ce, ok := err.(*url.Error); ok {
 			if ce.Timeout() {
-				httpErr := &ErrTimeout{StatusCode: http.StatusGatewayTimeout, Message: "timeout proxy error", Reason: ce.Error()}
-				responseJSON(w, httpErr.StatusCode, httpErr)
+				w.WriteHeader(http.StatusGatewayTimeout)
 				return
 			}
 		}
-		httpErr := &ErrInternalProxy{StatusCode: http.StatusInternalServerError, Message: "internal proxy error", Reason: err.Error()}
-		responseJSON(w, httpErr.StatusCode, httpErr)
+		w.WriteHeader(http.StatusServiceUnavailable)
 	}
-}
-
-func response(w http.ResponseWriter, contentType string, statusCode int, body io.Reader) {
-	w.Header().Set("Content-Type", contentType)
-	w.WriteHeader(statusCode)
-	if _, err := io.Copy(w, body); err != nil {
-		log.Printf("error when try response request, reason: %v", err)
-	}
-}
-
-func responseJSON(w http.ResponseWriter, statusCode int, rawBody interface{}) {
-	body, err := json.Marshal(rawBody)
-	if err != nil {
-		log.Printf("error when try serealize response body, reason: %v", err)
-	}
-	response(w, "application/json; charset=UTF-8", statusCode, bytes.NewBuffer(body))
 }
 
 // ErrRuleNotFound is an structure to response not found error
 type ErrRuleNotFound struct {
-	StatusCode int    `json:"statusCode"`
-	Message    string `json:"message"`
+	message string
 }
 
-func (ernf *ErrRuleNotFound) Error() string {
-	return ernf.Message
+func (e *ErrRuleNotFound) Error() string {
+	return e.message
 }
 
-// ErrInternalProxy is an structure to report error in proxy
-type ErrInternalProxy struct {
-	StatusCode int    `json:"statusCode"`
-	Message    string `json:"message"`
-	Reason     string `json:"reason"`
-}
-
-func (eip *ErrInternalProxy) Error() string {
-	return eip.Message
-}
-
-// ErrTimeout is an structure to report error in timeout proxy
-type ErrTimeout struct {
-	StatusCode int    `json:"statusCode"`
-	Message    string `json:"message"`
-	Reason     string `json:"reason"`
-}
-
-func (eip *ErrTimeout) Error() string {
-	return eip.Message
-}
-
-func getMatchRuleByClaim(rls Rules, claim *Claim) *Rule {
+func getMatchRuleByClaim(rls Rules, claim *Claim) (*Rule, error) {
 	for _, rl := range rls {
 		if found := rl.MatchByClaim(claim); found {
-			return &rl
+			return &rl, nil
 		}
 	}
-	return nil
+	return nil, &ErrRuleNotFound{"rule not found"}
 }

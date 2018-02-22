@@ -7,18 +7,25 @@ import (
 // Headers alias type for map[string]string
 type Headers map[string]string
 
-// Body is body structure for rules
-type Body struct {
-	Type   string            `yaml:"type"`
-	Scheme map[string]string `yaml:"scheme"`
-}
-
 // Claim is claim structure for rules
 type Claim struct {
+	Host    string  `yaml:"host"`
 	Path    string  `yaml:"path"`
 	Method  string  `yaml:"method"`
 	Headers Headers `yaml:"headers"`
 }
+
+// Rule is structure that contains parameters to proxy
+type Rule struct {
+	Name         string  `yaml:"name"`
+	URL          string  `yaml:"url"`
+	AbsolutePath bool    `yaml:"absolute_path"`
+	Timeout      int64   `yaml:"timeout"`
+	Claims       []Claim `yaml:"claims"`
+}
+
+// Rules is alias to []Rule
+type Rules []Rule
 
 // ContainsByHeaders verify if contains A in B as (map[string]string)
 func (c *Claim) ContainsByHeaders(hs Headers) bool {
@@ -30,33 +37,27 @@ func (c *Claim) ContainsByHeaders(hs Headers) bool {
 	return true
 }
 
-func newClaim(path, method string, headers map[string][]string) *Claim {
+func newClaim(host, path, method string, headers map[string][]string) *Claim {
 	cHeaders := make(map[string]string)
 	for key, value := range headers {
 		cHeaders[key] = strings.Join(value, " ")
 	}
 	return &Claim{
+		Host:    host,
 		Path:    path,
 		Method:  method,
 		Headers: cHeaders,
 	}
 }
 
-// Rule is structure that contains parameters to proxy
-type Rule struct {
-	Name    string  `yaml:"name"`
-	URL     string  `yaml:"url"`
-	Body    Body    `yaml:"body"`
-	Timeout int64   `yaml:"timeout"`
-	Claims  []Claim `yaml:"claims"`
-}
-
-// Rules is alias to []Rule
-type Rules []Rule
-
 // MatchByClaim match by rule claim
 func (r Rule) MatchByClaim(c *Claim) bool {
 	for _, claim := range r.Claims {
+		if claim.Host != "" {
+			if claim.Host != c.Host {
+				continue
+			}
+		}
 		if claim.Path != "" {
 			if claim.Path != c.Path {
 				continue

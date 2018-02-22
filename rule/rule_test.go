@@ -51,7 +51,7 @@ func (s *RuleSuite) TestMatchWithValidRule(c *check.C) {
 			}
 		}
 		for _, rl := range rls {
-			claim := newClaim(r.URL.EscapedPath(), r.Method, r.Header)
+			claim := newClaim(r.Host, r.URL.EscapedPath(), r.Method, r.Header)
 			if found := rl.MatchByClaim(claim); found {
 				c.Assert(rl.Name, check.Equals, test.Expected)
 			}
@@ -79,7 +79,7 @@ func (s *RuleSuite) TestMatchWithNotFoundRule(c *check.C) {
 			}
 		}
 		for _, rl := range rules {
-			claim := newClaim(r.URL.EscapedPath(), r.Method, nil)
+			claim := newClaim(r.Host, r.URL.EscapedPath(), r.Method, nil)
 			c.Check(rl.MatchByClaim(claim), check.Equals, false)
 		}
 	}

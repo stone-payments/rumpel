@@ -2,11 +2,11 @@
 	"version": 0,
 	"dependencies": [
 		{
-			"importpath": "github.com/ghodss/yaml",
-			"repository": "https://github.com/ghodss/yaml",
+			"importpath": "github.com/go-yaml/yaml",
+			"repository": "https://github.com/go-yaml/yaml",
 			"vcs": "git",
-			"revision": "0ca9ea5df5451ffdf184b4428c902747c2c11cd7",
-			"branch": "master",
+			"revision": "7f97868eec74b32b0982dd158a51a446d1da7eb5",
+			"branch": "v2",
 			"notests": true
 		},
 		{
