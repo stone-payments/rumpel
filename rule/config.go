@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/ghodss/yaml"
+	"github.com/go-yaml/yaml"
 )
 
 // ErrCannotReadRulesFile to report error when cannot read a rules config file
@@ -32,7 +32,7 @@ func Config(path string) (Rules, error) {
 		return nil, &ErrCannotReadRulesFile{err}
 	}
 
-	rules := make([]Rule, 0)
+	rules := make(Rules, 0)
 	if err := yaml.Unmarshal(content, &rules); err != nil {
 		return nil, &ErrInvalidRulesFile{err}
 	}

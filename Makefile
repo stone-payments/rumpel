@@ -1,37 +1,35 @@
-PROJECT := rumpel
-ENTRYPOINT_DIR := ./cmd/$(PROJECT)
-ENTRYPOINT_FILE := $(ENTRYPOINT_DIR)/main.go
+APP ?= rumpel
 
-BIN_DIR := $(GOPATH)/bin
-GOMETALINTER := $(BIN_DIR)/gometalinter
-GVT := $(BIN_DIR)/gvt
+bin := $(GOPATH)/bin
+src := ./cmd/$(APP)/main.go
+dst := $(bin)/$(APP)
+
+gometalinter := $(bin)/gometalinter
 
 .PHONY: deps test lint build
 
-$(BIN_DIR)/$(PROJECT): test
-	CGO_ENABLED=0 go install $(ENTRYPOINT_DIR)
+$(dst): test
+	@echo "===> Building app..."
+	@CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -v -installsuffix nocgo -o $(dst) $(src)
+	@echo -e "\n"
 
-unit-test:
+test: lint
+	@echo -e "===> Testing packages..."
 	@echo "mode: count" > coverage-all.out
 	@for pkg in $(shell go list ./... | grep -v /vendor/); do \
 		go test -coverprofile=coverage.out -covermode=count $$pkg -timeout 30ms -check.v && \
 		tail -n +2 coverage.out >> ./coverage-all.out; \
 	done
+	@echo -e "\n"
 
-test: lint unit-test
-
-lint: $(GOMETALINTER)
+lint: $(gometalinter)
+	@echo "===> Executing linter..."
 	@gometalinter ./... --tests --vendor
+	@echo -e "\n"
 
-$(GOMETALINTER):
+$(gometalinter):
 	go get -u -v github.com/alecthomas/gometalinter
 	gometalinter -i
-
-run:
-	go run -race $(ENTRYPOINT_FILE)
-
-$(GVT):
-	go get -u -v github.com/FiloSottile/gvt
 
 cover:
 	@go tool cover -html=coverage-all.out
