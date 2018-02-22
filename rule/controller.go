@@ -6,15 +6,16 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/stone-payments/rumpel/proxy"
 )
 
 func (rls Rules) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	claim := newClaim(r.URL.EscapedPath(), r.Method, r.Header)
-	rl, err := getMatchRuleByClaim(rls, claim)
-	if err != nil {
+	claim := newClaim(r.Host, r.URL.EscapedPath(), r.Method, r.Header)
+	rl := getMatchRuleByClaim(rls, claim)
+	if rl == nil {
 		httpErr := &ErrRuleNotFound{StatusCode: http.StatusNotFound, Message: "not could match the rule"}
 		responseJSON(w, httpErr.StatusCode, httpErr)
 		return
@@ -27,8 +28,15 @@ func (rls Rules) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		Body:    r.Body,
 		Timeout: time.Duration(rl.Timeout),
 	}
-	err = proxy.Do(w, pr)
+	err := proxy.Do(w, pr)
 	if err != nil {
+		if ce, ok := err.(*url.Error); ok {
+			if ce.Timeout() {
+				httpErr := &ErrTimeout{StatusCode: http.StatusGatewayTimeout, Message: "timeout proxy error", Reason: ce.Error()}
+				responseJSON(w, httpErr.StatusCode, httpErr)
+				return
+			}
+		}
 		httpErr := &ErrInternalProxy{StatusCode: http.StatusInternalServerError, Message: "internal proxy error", Reason: err.Error()}
 		responseJSON(w, httpErr.StatusCode, httpErr)
 	}
@@ -71,11 +79,22 @@ func (eip *ErrInternalProxy) Error() string {
 	return eip.Message
 }
 
-func getMatchRuleByClaim(rls Rules, claim *Claim) (*Rule, error) {
+// ErrTimeout is an structure to report error in timeout proxy
+type ErrTimeout struct {
+	StatusCode int    `json:"statusCode"`
+	Message    string `json:"message"`
+	Reason     string `json:"reason"`
+}
+
+func (eip *ErrTimeout) Error() string {
+	return eip.Message
+}
+
+func getMatchRuleByClaim(rls Rules, claim *Claim) *Rule {
 	for _, rl := range rls {
 		if found := rl.MatchByClaim(claim); found {
-			return &rl, nil
+			return &rl
 		}
 	}
-	return nil, &ErrRuleNotFound{}
+	return nil
 }
