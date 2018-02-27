@@ -23,16 +23,3 @@
 #   claims:
 #   - host: 127.0.0.1:28080
 #     path: /ab
-
-- name: domain
-  url: https://www.stone.com.br
-  absolute_path: true
-  claims:
-  - host: 127.0.0.1:28080
-    path: /abacaxi
-  - path: /jorge
-
-- name: assets
-  url: https://www.stone.com.br
-  claims:
-  - host: 127.0.0.1:28080
