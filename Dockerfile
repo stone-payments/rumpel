@@ -9,4 +9,4 @@ COPY --from=builder /rumpel /usr/bin/rumpel
 ENV RUMPEL_RULES /.rumpel
 VOLUME $RUMPEL_RULES
 WORKDIR $RUMPEL_RULES
-ENTRYPOINT rumpel -rules=$RUMPEL_RULES
+ENTRYPOINT [ "rumpel" ]
