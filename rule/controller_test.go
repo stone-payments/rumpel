@@ -15,7 +15,7 @@ func (s *RuleSuite) TestControllerNotFoundRule(c *check.C) {
 
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest("GET", "/x", nil)
-	rls.ServeHTTP(w, r)
+	rls.Proxy(false).ServeHTTP(w, r)
 
 	c.Check(w.Code, check.Equals, http.StatusNotFound)
 }
@@ -33,7 +33,7 @@ func (s *RuleSuite) TestControllerProxy(c *check.C) {
 
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest("GET", "/a", nil)
-	rls.ServeHTTP(w, r)
+	rls.Proxy(false).ServeHTTP(w, r)
 
 	c.Check(w.Code, check.Equals, http.StatusGone)
 }

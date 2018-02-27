@@ -50,7 +50,7 @@ func Read(name string, args []string) (*Environment, error) {
 
 	env.RulesConfigPath = os.Getenv(rulesConfigPathName)
 	if env.RulesConfigPath == "" {
-		cmd.StringVar(&env.RulesConfigPath, "rules", ".rumpel.yaml", "parameter for rule configurations")
+		cmd.StringVar(&env.RulesConfigPath, "rules", "./", "parameter for rule configurations")
 	}
 
 	env.ApplicationPort = os.Getenv(applicationPortName)

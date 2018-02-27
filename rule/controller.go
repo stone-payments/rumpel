@@ -10,6 +10,7 @@ import (
 	"github.com/stone-payments/rumpel/proxy"
 )
 
+// Proxy is handle for rule proxy
 func (rls Rules) Proxy(verbose bool) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
@@ -47,7 +48,7 @@ func (rls Rules) Proxy(verbose bool) http.HandlerFunc {
 				Application:  "rumpel",
 				Method:       r.Method,
 				Scheme:       r.Proto,
-				Origin:       fmt.Sprintf("%v%v%v", r.URL.Scheme, r.Host, r.URL.Path),
+				Origin:       fmt.Sprintf("%v%v", r.Host, r.URL.Path),
 				Target:       u,
 				ResponseTime: fmt.Sprintf("%vs", fmt.Sprintf("%.3f", time.Since(start).Seconds())),
 			}
