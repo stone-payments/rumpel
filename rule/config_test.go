@@ -23,18 +23,20 @@ func (s *RuleSuite) TestReadRulesFileNoExistsFile(c *check.C) {
 }
 
 func (s *RuleSuite) TestInvalidFormatRulesFile(c *check.C) {
-	path := "./test.yaml"
+	path := "./"
 	content := []byte(`routes test`)
 
-	file, err := os.Create(path)
+	pathFile := fmt.Sprintf("%v/.rules.yaml", path)
+
+	file, err := os.Create(pathFile)
 	c.Assert(err, check.IsNil)
 
 	_, err = file.Write(content)
 	c.Assert(err, check.IsNil)
 
-	defer func(c *check.C, path string) {
-		c.Assert(os.Remove(path), check.IsNil)
-	}(c, path)
+	defer func(c *check.C, pathFile string) {
+		c.Assert(os.Remove(pathFile), check.IsNil)
+	}(c, pathFile)
 
 	rls, err := Config(path)
 	c.Assert(rls, check.IsNil)
@@ -42,7 +44,7 @@ func (s *RuleSuite) TestInvalidFormatRulesFile(c *check.C) {
 }
 
 func (s *RuleSuite) TestReadRulesFileSuccessful(c *check.C) {
-	path := "./test.yaml"
+	path := "./"
 	content := []byte(`
 ---
 - name: A
@@ -60,15 +62,18 @@ func (s *RuleSuite) TestReadRulesFileSuccessful(c *check.C) {
     headers:
       X-Test: true
 `)
-	file, err := os.Create(path)
+
+	pathFile := fmt.Sprintf("%v/.rules.yaml", path)
+
+	file, err := os.Create(pathFile)
 	c.Assert(err, check.IsNil)
 
 	_, err = file.Write(content)
 	c.Assert(err, check.IsNil)
 
-	defer func(c *check.C, path string) {
-		c.Assert(os.Remove(path), check.IsNil)
-	}(c, path)
+	defer func(c *check.C, pathFile string) {
+		c.Assert(os.Remove(pathFile), check.IsNil)
+	}(c, pathFile)
 
 	result, err := Config(path)
 	c.Assert(err, check.IsNil)

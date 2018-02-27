@@ -23,3 +23,9 @@
 #   claims:
 #   - host: 127.0.0.1:28080
 #     path: /ab
+
+---
+- name: Example
+  url: https://api.github.com
+  claims:
+  - host: 127.0.0.1:8080

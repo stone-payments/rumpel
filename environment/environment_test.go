@@ -25,7 +25,7 @@ func (s *EnvironmentSuite) TestReadEnvironmentByVariables(c *check.C) {
 	}(c)
 
 	result, _ := Read(TestMode, []string{"rumpel"})
-	expected := Environment{TestMode, "test-file", "test-port"}
+	expected := Environment{TestMode, "test-file", "test-port", false}
 
 	c.Check(expected, check.DeepEquals, *result)
 }
@@ -42,7 +42,7 @@ func (s *EnvironmentSuite) TestReadEnvironmentByFlags(c *check.C) {
 			Environment{
 				Name:            TestMode,
 				ApplicationPort: ":4040",
-				RulesConfigPath: ".rumpel.yaml",
+				RulesConfigPath: "./",
 			},
 		},
 		{

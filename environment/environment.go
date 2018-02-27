@@ -10,7 +10,7 @@ import (
 
 // Constants for work with alias for environment variables
 const (
-	rulesConfigPathName = "RUMPEL_RULES_FILE"
+	rulesConfigPathName = "RUMPEL_RULES"
 	applicationPortName = "RUMPEL_APPLICATION_PORT"
 	verbose             = "RUMPEL_VERBOSE"
 )
@@ -50,7 +50,7 @@ func Read(name string, args []string) (*Environment, error) {
 
 	env.RulesConfigPath = os.Getenv(rulesConfigPathName)
 	if env.RulesConfigPath == "" {
-		cmd.StringVar(&env.RulesConfigPath, "rules", ".rumpel.yaml", "parameter for rule configurations")
+		cmd.StringVar(&env.RulesConfigPath, "rules", "./", "parameter for rule configurations")
 	}
 
 	env.ApplicationPort = os.Getenv(applicationPortName)
