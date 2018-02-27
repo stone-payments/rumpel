@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -11,6 +12,7 @@ import (
 const (
 	rulesConfigPathName = "RUMPEL_RULES_FILE"
 	applicationPortName = "RUMPEL_APPLICATION_PORT"
+	verbose             = "RUMPEL_VERBOSE"
 )
 
 // Alias for environments mode name
@@ -25,6 +27,7 @@ type Environment struct {
 	Name            string
 	RulesConfigPath string
 	ApplicationPort string
+	Verbose         bool
 }
 
 // ErrCannotReadEnvironment to report error when cannot read environment
@@ -53,6 +56,12 @@ func Read(name string, args []string) (*Environment, error) {
 	env.ApplicationPort = os.Getenv(applicationPortName)
 	if env.ApplicationPort == "" {
 		cmd.StringVar(&env.ApplicationPort, "port", ":28080", "parameter for set application port")
+	}
+
+	var err error
+	env.Verbose, err = strconv.ParseBool(os.Getenv(verbose))
+	if err != nil {
+		cmd.BoolVar(&env.Verbose, "verbose", false, "parameter for set verbose log")
 	}
 
 	if err := cmd.Parse(args[1:]); err != nil {

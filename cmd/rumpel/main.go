@@ -31,6 +31,7 @@ func main() {
 
   Environment mode:  {{.Name}}
   Rule config path:  {{.RulesConfigPath}}
+  Verbose mode:      {{.Verbose}}
   Running on port:   {{.ApplicationPort}}
 
 `))
@@ -40,7 +41,7 @@ func main() {
 
 	server := http.Server{
 		Addr:    env.ApplicationPort,
-		Handler: rls,
+		Handler: rls.Proxy(env.Verbose),
 	}
 	if err := server.ListenAndServe(); err != nil {
 		log.Panicf("Server error: %v", err)

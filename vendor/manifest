@@ -10,6 +10,30 @@
 			"notests": true
 		},
 		{
+			"importpath": "go.uber.org/atomic",
+			"repository": "https://github.com/uber-go/atomic",
+			"vcs": "git",
+			"revision": "8474b86a5a6f79c443ce4b2992817ff32cf208b8",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "go.uber.org/multierr",
+			"repository": "https://github.com/uber-go/multierr",
+			"vcs": "git",
+			"revision": "ddea229ff1dff9e6fe8a6c0344ac73b09e81fce5",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "go.uber.org/zap",
+			"repository": "https://github.com/uber-go/zap",
+			"vcs": "git",
+			"revision": "f85c78b1dd998214c5f2138155b320a4a43fbe36",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "gopkg.in/check.v1",
 			"repository": "https://gopkg.in/check.v1",
 			"vcs": "git",
