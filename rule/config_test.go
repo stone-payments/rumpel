@@ -4,46 +4,45 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"testing"
 
-	check "gopkg.in/check.v1"
+	"github.com/stretchr/testify/assert"
 )
 
-func (s *RuleSuite) TestReadRulesFileWithEmptyPath(c *check.C) {
+func TestReadRulesFileWithEmptyPath(t *testing.T) {
 	rls, err := Config("")
-
-	c.Assert(rls, check.IsNil)
-	c.Assert(err, check.FitsTypeOf, &ErrCannotReadRulesFile{})
+	assert.Nil(t, rls)
+	assert.IsType(t, &ErrCannotReadRulesFile{}, err)
 }
 
-func (s *RuleSuite) TestReadRulesFileNoExistsFile(c *check.C) {
+func TestReadRulesFileNoExistsFile(t *testing.T) {
 	rls, err := Config("./test.yaml")
-
-	c.Assert(rls, check.IsNil)
-	c.Assert(err, check.FitsTypeOf, &ErrCannotReadRulesFile{})
+	assert.Nil(t, rls)
+	assert.IsType(t, &ErrCannotReadRulesFile{}, err)
 }
 
-func (s *RuleSuite) TestInvalidFormatRulesFile(c *check.C) {
+func TestInvalidFormatRulesFile(t *testing.T) {
 	path := "./"
 	content := []byte(`routes test`)
 
 	pathFile := fmt.Sprintf("%v/.rules.yaml", path)
 
 	file, err := os.Create(pathFile)
-	c.Assert(err, check.IsNil)
+	assert.Nil(t, err)
 
 	_, err = file.Write(content)
-	c.Assert(err, check.IsNil)
+	assert.Nil(t, err)
 
-	defer func(c *check.C, pathFile string) {
-		c.Assert(os.Remove(pathFile), check.IsNil)
-	}(c, pathFile)
+	defer func(t *testing.T, pathFile string) {
+		assert.Nil(t, os.Remove(pathFile))
+	}(t, pathFile)
 
 	rls, err := Config(path)
-	c.Assert(rls, check.IsNil)
-	c.Assert(err, check.FitsTypeOf, &ErrInvalidRulesFile{})
+	assert.Nil(t, rls)
+	assert.IsType(t, &ErrInvalidRulesFile{}, err)
 }
 
-func (s *RuleSuite) TestReadRulesFileSuccessful(c *check.C) {
+func TestReadRulesFileSuccessful(t *testing.T) {
 	path := "./"
 	content := []byte(`
 ---
@@ -66,28 +65,28 @@ func (s *RuleSuite) TestReadRulesFileSuccessful(c *check.C) {
 	pathFile := fmt.Sprintf("%v/.rules.yaml", path)
 
 	file, err := os.Create(pathFile)
-	c.Assert(err, check.IsNil)
+	assert.Nil(t, err)
 
 	_, err = file.Write(content)
-	c.Assert(err, check.IsNil)
+	assert.Nil(t, err)
 
-	defer func(c *check.C, pathFile string) {
-		c.Assert(os.Remove(pathFile), check.IsNil)
-	}(c, pathFile)
+	defer func(t *testing.T, pathFile string) {
+		assert.Nil(t, os.Remove(pathFile))
+	}(t, pathFile)
 
 	result, err := Config(path)
-	c.Assert(err, check.IsNil)
-	c.Assert(result, check.HasLen, 2)
+	assert.Nil(t, err)
+	assert.Len(t, result, 2)
 }
 
-func (s *RuleSuite) TestErrorFromErrCannotReadRulesFile(c *check.C) {
+func TestErrorFromErrCannotReadRulesFile(t *testing.T) {
 	err := &ErrCannotReadRulesFile{Reason: errors.New("B")}
 	expected := fmt.Sprintf("cannot read rules file, reason: %v", err.Reason)
-	c.Check(err.Error(), check.Equals, expected)
+	assert.Equal(t, err.Error(), expected)
 }
 
-func (s *RuleSuite) TestErrorFromErrInvalidRulesFile(c *check.C) {
+func TestErrorFromErrInvalidRulesFile(t *testing.T) {
 	err := &ErrInvalidRulesFile{Reason: errors.New("B")}
 	expected := fmt.Sprintf("invalid rule file, reason: %v", err.Reason)
-	c.Check(err.Error(), check.Equals, expected)
+	assert.Equal(t, err.Error(), expected)
 }

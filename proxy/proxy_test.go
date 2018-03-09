@@ -6,16 +6,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	check "gopkg.in/check.v1"
+	"github.com/stretchr/testify/assert"
 )
 
-func Test(t *testing.T) { check.TestingT(t) }
-
-type ProxySuite struct{}
-
-var _ = check.Suite(&ProxySuite{})
-
-func (s *ProxySuite) TestProxy(c *check.C) {
+func TestProxy(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	header := http.Header{}
@@ -27,18 +21,18 @@ func (s *ProxySuite) TestProxy(c *check.C) {
 		Body:   bytes.NewBuffer([]byte(`{"test":"hello test"}`)),
 	}
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		c.Assert(r.Method, check.Equals, pr.Method)
+		assert.Equal(t, r.Method, pr.Method)
 	}))
 	defer server.Close()
 
 	pr.URL = server.URL
-	c.Assert(Do(w, pr), check.IsNil)
+	assert.Nil(t, Do(w, pr))
 }
 
-func (s *ProxySuite) TestCopyHeader(c *check.C) {
+func TestCopyHeader(t *testing.T) {
 	dst := http.Header{}
 	src := http.Header{"Gnr": []string{"axl", "slash", "duff", "steve", "dizzy"}}
 
 	copyHeader(dst, src)
-	c.Assert(src, check.DeepEquals, dst)
+	assert.Equal(t, src, dst)
 }

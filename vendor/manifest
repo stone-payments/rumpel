@@ -10,6 +10,14 @@
 			"notests": true
 		},
 		{
+			"importpath": "github.com/stretchr/testify",
+			"repository": "https://github.com/stretchr/testify",
+			"vcs": "git",
+			"revision": "b89eecf5ca5db6d3ba60b237ffe3df7bafb7662f",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "go.uber.org/atomic",
 			"repository": "https://github.com/uber-go/atomic",
 			"vcs": "git",
@@ -31,14 +39,6 @@
 			"vcs": "git",
 			"revision": "f85c78b1dd998214c5f2138155b320a4a43fbe36",
 			"branch": "master",
-			"notests": true
-		},
-		{
-			"importpath": "gopkg.in/check.v1",
-			"repository": "https://gopkg.in/check.v1",
-			"vcs": "git",
-			"revision": "20d25e2804050c1cd24a7eea1e7a6447dd0e74ec",
-			"branch": "v1",
 			"notests": true
 		}
 	]

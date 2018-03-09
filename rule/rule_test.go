@@ -2,11 +2,12 @@ package rule
 
 import (
 	"net/http/httptest"
+	"testing"
 
-	check "gopkg.in/check.v1"
+	"github.com/stretchr/testify/assert"
 )
 
-func (s *RuleSuite) TestContainsByHeaders(c *check.C) {
+func TestContainsByHeaders(t *testing.T) {
 	cases := []struct {
 		Claim     *Claim
 		Parameter Headers
@@ -20,11 +21,11 @@ func (s *RuleSuite) TestContainsByHeaders(c *check.C) {
 	}
 	for _, test := range cases {
 		result := test.Claim.ContainsByHeaders(test.Parameter)
-		c.Check(test.Expected, check.Equals, result)
+		assert.Equal(t, test.Expected, result)
 	}
 }
 
-func (s *RuleSuite) TestMatchWithValidRule(c *check.C) {
+func TestMatchWithValidRule(t *testing.T) {
 	rls := Rules{
 		{Name: "A", URL: "a.com.br/publish/split_queue", Claims: []Claim{{Path: "/a"}, {Path: "/ab", Method: "PUT"}}},
 		{Name: "C", URL: "c.com.br/publish/split_queue", Claims: []Claim{{Path: "/c", Headers: map[string]string{"X-Test": "true"}}}},
@@ -53,13 +54,13 @@ func (s *RuleSuite) TestMatchWithValidRule(c *check.C) {
 		for _, rl := range rls {
 			claim := newClaim(r.Host, r.URL.EscapedPath(), r.Method, r.Header)
 			if found := rl.MatchByClaim(claim); found {
-				c.Assert(rl.Name, check.Equals, test.Expected)
+				assert.Equal(t, test.Expected, rl.Name)
 			}
 		}
 	}
 }
 
-func (s *RuleSuite) TestMatchWithNotFoundRule(c *check.C) {
+func TestMatchWithNotFoundRule(t *testing.T) {
 	rules := Rules{
 		{Name: "A", URL: "a.com.br/publish/split_queue", Claims: []Claim{{Path: "/a"}, {Path: "/ab", Method: "PUT"}}},
 		{Name: "C", URL: "c.com.br/publish/split_queue", Claims: []Claim{{Path: "/c", Headers: map[string]string{"X-Test": "true"}}}},
@@ -80,7 +81,7 @@ func (s *RuleSuite) TestMatchWithNotFoundRule(c *check.C) {
 		}
 		for _, rl := range rules {
 			claim := newClaim(r.Host, r.URL.EscapedPath(), r.Method, nil)
-			c.Check(rl.MatchByClaim(claim), check.Equals, false)
+			assert.Equal(t, false, rl.MatchByClaim(claim))
 		}
 	}
 }

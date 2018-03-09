@@ -3,11 +3,12 @@ package rule
 import (
 	"net/http"
 	"net/http/httptest"
+	"testing"
 
-	check "gopkg.in/check.v1"
+	"github.com/stretchr/testify/assert"
 )
 
-func (s *RuleSuite) TestControllerNotFoundRule(c *check.C) {
+func TestControllerNotFoundRule(t *testing.T) {
 	rls := Rules{
 		{Name: "A", URL: "a.com.br/publish/split_queue", Claims: []Claim{{Path: "/a"}, {Path: "/ab", Method: "PUT"}}},
 		{Name: "C", URL: "c.com.br/publish/split_queue", Claims: []Claim{{Path: "/c", Headers: map[string]string{"X-Test": "true"}}}},
@@ -17,10 +18,10 @@ func (s *RuleSuite) TestControllerNotFoundRule(c *check.C) {
 	r := httptest.NewRequest("GET", "/x", nil)
 	rls.Proxy(false).ServeHTTP(w, r)
 
-	c.Check(w.Code, check.Equals, http.StatusNotFound)
+	assert.Equal(t, http.StatusNotFound, w.Code)
 }
 
-func (s *RuleSuite) TestControllerProxy(c *check.C) {
+func TestControllerProxy(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusGone)
 	}))
@@ -35,5 +36,5 @@ func (s *RuleSuite) TestControllerProxy(c *check.C) {
 	r := httptest.NewRequest("GET", "/a", nil)
 	rls.Proxy(false).ServeHTTP(w, r)
 
-	c.Check(w.Code, check.Equals, http.StatusGone)
+	assert.Equal(t, http.StatusGone, w.Code)
 }

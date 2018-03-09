@@ -6,31 +6,25 @@ import (
 	"os"
 	"testing"
 
-	check "gopkg.in/check.v1"
+	"github.com/stretchr/testify/assert"
 )
 
-func Test(t *testing.T) { check.TestingT(t) }
+func TestReadEnvironmentByVariables(t *testing.T) {
+	assert.Nil(t, os.Setenv(applicationPortName, "test-port"))
+	assert.Nil(t, os.Setenv(rulesConfigPathName, "test-file"))
 
-type EnvironmentSuite struct{}
-
-var _ = check.Suite(&EnvironmentSuite{})
-
-func (s *EnvironmentSuite) TestReadEnvironmentByVariables(c *check.C) {
-	c.Assert(os.Setenv(applicationPortName, "test-port"), check.IsNil)
-	c.Assert(os.Setenv(rulesConfigPathName, "test-file"), check.IsNil)
-
-	defer func(c *check.C) {
-		c.Assert(os.Unsetenv(applicationPortName), check.IsNil)
-		c.Assert(os.Unsetenv(rulesConfigPathName), check.IsNil)
-	}(c)
+	defer func(t *testing.T) {
+		assert.Nil(t, os.Unsetenv(applicationPortName))
+		assert.Nil(t, os.Unsetenv(rulesConfigPathName))
+	}(t)
 
 	result, _ := Read(TestMode, []string{"rumpel"})
 	expected := Environment{TestMode, "test-file", "test-port", false}
 
-	c.Check(expected, check.DeepEquals, *result)
+	assert.Equal(t, expected, *result)
 }
 
-func (s *EnvironmentSuite) TestReadEnvironmentByFlags(c *check.C) {
+func TestReadEnvironmentByFlags(t *testing.T) {
 	cases := []struct {
 		Name      string
 		Arguments []string
@@ -67,24 +61,27 @@ func (s *EnvironmentSuite) TestReadEnvironmentByFlags(c *check.C) {
 
 	for _, test := range cases {
 		result, _ := Read(test.Name, test.Arguments)
-		c.Check(test.Expected, check.DeepEquals, *result)
+		assert.Equal(t, test.Expected, *result)
 	}
 }
 
-func (s *EnvironmentSuite) TestReadEnvironmentWithEmptyName(c *check.C) {
+func TestReadEnvironmentWithEmptyName(t *testing.T) {
 	result, err := Read("", []string{"rumpel"})
 	expected := DevelopmentMode
-	c.Assert(err, check.IsNil)
-	c.Check(expected, check.Equals, result.Name)
+	assert.NoError(t, err)
+	assert.Equal(t, expected, result.Name)
 }
 
-func (s *EnvironmentSuite) TestReadEnvironmentFailure(c *check.C) {
-	_, err := Read("", []string{"rumpel", "-test.v", "testing"})
-	c.Assert(err, check.NotNil)
+func TestReadEnvironmentFailure(t *testing.T) {
+	errTypeExpected := &ErrCannotReadEnvironment{}
+	env, err := Read("", []string{"rumpel", "-test.v", "testing"})
+	assert.Error(t, err)
+	assert.IsType(t, errTypeExpected, err)
+	assert.Nil(t, env)
 }
 
-func (s *EnvironmentSuite) TestErrorFromErrCannotReadEnvironment(c *check.C) {
+func TestErrorFromErrCannotReadEnvironment(t *testing.T) {
 	err := &ErrCannotReadEnvironment{Reason: errors.New("B")}
 	expected := fmt.Sprintf("Cannot read environment, reason: %v", err.Reason)
-	c.Check(err.Error(), check.Equals, expected)
+	assert.Equal(t, err.Error(), expected)
 }
