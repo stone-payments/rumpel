@@ -9,6 +9,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type writerTest struct{}
+
+func (wt writerTest) Write(b []byte) (int, error) {
+	return 0, nil
+}
+
+var writer = writerTest{}
+
 func TestReadEnvironmentByVariables(t *testing.T) {
 	assert.Nil(t, os.Setenv(applicationPortName, "test-port"))
 	assert.Nil(t, os.Setenv(rulesConfigPathName, "test-file"))
@@ -18,7 +26,7 @@ func TestReadEnvironmentByVariables(t *testing.T) {
 		assert.Nil(t, os.Unsetenv(rulesConfigPathName))
 	}(t)
 
-	result, _ := Read(TestMode, []string{"rumpel"})
+	result, _ := Read(TestMode, []string{"rumpel"}, writer)
 	expected := Environment{TestMode, "test-file", "test-port", false}
 
 	assert.Equal(t, expected, *result)
@@ -60,13 +68,13 @@ func TestReadEnvironmentByFlags(t *testing.T) {
 	}
 
 	for _, test := range cases {
-		result, _ := Read(test.Name, test.Arguments)
+		result, _ := Read(test.Name, test.Arguments, writer)
 		assert.Equal(t, test.Expected, *result)
 	}
 }
 
 func TestReadEnvironmentWithEmptyName(t *testing.T) {
-	result, err := Read("", []string{"rumpel"})
+	result, err := Read("", []string{"rumpel"}, writer)
 	expected := DevelopmentMode
 	assert.NoError(t, err)
 	assert.Equal(t, expected, result.Name)
@@ -74,7 +82,7 @@ func TestReadEnvironmentWithEmptyName(t *testing.T) {
 
 func TestReadEnvironmentFailure(t *testing.T) {
 	errTypeExpected := &ErrCannotReadEnvironment{}
-	env, err := Read("", []string{"rumpel", "-test.v", "testing"})
+	env, err := Read("", []string{"rumpel", "-test.v", "testing"}, writer)
 	assert.Error(t, err)
 	assert.IsType(t, errTypeExpected, err)
 	assert.Nil(t, env)

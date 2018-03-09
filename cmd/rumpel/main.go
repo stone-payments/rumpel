@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	env, err := environment.Read(os.Getenv("RUMPEL_MODE"), os.Args)
+	env, err := environment.Read(os.Getenv("RUMPEL_MODE"), os.Args, nil)
 	if err != nil {
 		log.Fatalf("\n%v", err)
 	}

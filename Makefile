@@ -15,7 +15,9 @@ $(dst): test
 	@CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -v -installsuffix nocgo -o $(dst) $(src)
 
 test: $(gojunitreport) lint
-	@go test -v -cover $(shell go list ./... | grep -v /vendor/) | go-junit-report > $(REPORT_FILE).xml
+	@echo "===> Testing packages..."
+	@2>&1 go test -v -cover $(shell go list ./... | grep -v /vendor/) | tee tests.out
+	@cat tests.out | go-junit-report -set-exit-code=1 > $(REPORT_FILE).xml
 
 lint: $(gometalinter)
 	@echo "===> Executing linter..."

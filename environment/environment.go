@@ -3,6 +3,7 @@ package environment
 import (
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"strconv"
 	"strings"
@@ -40,13 +41,17 @@ func (e *ErrCannotReadEnvironment) Error() string {
 }
 
 // Read environments
-func Read(name string, args []string) (*Environment, error) {
+func Read(name string, args []string, output io.Writer) (*Environment, error) {
 	env := &Environment{Name: strings.ToUpper(name)}
 	if env.Name == "" {
 		env.Name = DevelopmentMode
 	}
 
 	cmd := flag.NewFlagSet(args[0], flag.ContinueOnError)
+
+	if output != nil {
+		cmd.SetOutput(output)
+	}
 
 	env.RulesConfigPath = os.Getenv(rulesConfigPathName)
 	if env.RulesConfigPath == "" {
