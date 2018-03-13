@@ -1,5 +1,7 @@
 # Rumpel
 
+
+![Visual Studio Team services](https://stonepagamentos.visualstudio.com/_apis/public/build/definitions/48d46de6-0503-4ae6-97eb-6c1e02dd6a4d/228/badge)
 [![Travis Build Status](https://img.shields.io/travis/stone-payments/rumpel.svg?style=flat-square)](https://travis-ci.org/stone-payments/rumpel)
 [![Coverage Status](https://img.shields.io/coveralls/github/stone-payments/rumpel.svg?style=flat-square)](https://coveralls.io/github/stone-payments/rumpel)
 [![Go Report Card](https://goreportcard.com/badge/github.com/stone-payments/rumpel?style=flat-square)](https://goreportcard.com/report/github.com/stone-payments/rumpel)
