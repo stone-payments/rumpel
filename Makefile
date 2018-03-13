@@ -27,7 +27,7 @@ cover: $(gocover-cobertura) test
 	@gocover-cobertura < coverall.out > $(COVERAGE_FILE).xml
 	@go tool cover -html=coverall.out -o cover.html
 
-test: $(go-junit) lint
+test: $(go-junit-report) lint
 	@echo "===> Testing packages..."
 	@go test -v -cover $(shell go list ./... | grep -v /vendor/) | go-junit-report -set-exit-code=1 > $(REPORT_FILE).xml
 
@@ -45,6 +45,6 @@ $(gocover-cobertura):
 	go get -u -v github.com/t-yuki/gocover-cobertura
 
 $(go-junit-report):
-	@echo "===> Installing go-unit-report..."
+	@echo "===> Installing go-junit-report..."
 	go get -u -v github.com/jstemmer/go-junit-report
 
