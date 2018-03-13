@@ -25,7 +25,7 @@ func TestInvalidFormatRulesFile(t *testing.T) {
 	path := "./"
 	content := []byte(`routes test`)
 
-	pathFile := fmt.Sprintf("%v/.rules.yaml", path)
+	pathFile := fmt.Sprintf("%v/rules.yaml", path)
 
 	file, err := os.Create(pathFile)
 	assert.Nil(t, err)
@@ -62,7 +62,7 @@ func TestReadRulesFileSuccessful(t *testing.T) {
       X-Test: true
 `)
 
-	pathFile := fmt.Sprintf("%v/.rules.yaml", path)
+	pathFile := fmt.Sprintf("%v/rules.yaml", path)
 
 	file, err := os.Create(pathFile)
 	assert.Nil(t, err)

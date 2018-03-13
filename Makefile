@@ -12,11 +12,15 @@ go-junit-report := $(bin)/go-junit-report
 
 .PHONY: deps test lint build
 
-$(dst): cover
+$(dst): test
 	@echo "===> Building app..."
 	@CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -v -installsuffix nocgo -o $(dst) $(src)
 
-cover: $(gocover-cobertura) test
+test: $(go-junit-report) cover
+	@echo "===> Testing packages..."
+	@go test -v -cover $(shell go list ./... | grep -v /vendor/) | go-junit-report -set-exit-code=1 > $(REPORT_FILE).xml
+
+cover: $(gocover-cobertura) lint
 	@echo "===> Executing cover..."
 	@echo "mode: count" > coverall.out
 	@touch c.out
@@ -26,10 +30,6 @@ cover: $(gocover-cobertura) test
 	done
 	@gocover-cobertura < coverall.out > $(COVERAGE_FILE).xml
 	@go tool cover -html=coverall.out -o cover.html
-
-test: $(go-junit-report) lint
-	@echo "===> Testing packages..."
-	@go test -v -cover $(shell go list ./... | grep -v /vendor/) | go-junit-report -set-exit-code=1 > $(REPORT_FILE).xml
 
 lint: $(gometalinter)
 	@echo "===> Executing linter..."
