@@ -39,4 +39,4 @@ before_script:
 # in a modern Go project.
 script:
   - make
-  - goveralls -coverprofile=coverage-all.out -service travis-ci -repotoken $COVERALLS_TOKEN
+  - goveralls -coverprofile=coverall.out -service travis-ci -repotoken $COVERALLS_TOKEN
