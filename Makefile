@@ -26,6 +26,7 @@ cover: $(gocov) $(gocov-xml) test
 		tail -n +2 c.out >> coverall.out; \
 	done
 	@gocov convert coverall.out | gocov-xml > $(COVERAGE_FILE).xml
+	@go tool cover -html=coverall.out -o cover.html
 
 test: $(go-junit) lint
 	@echo "===> Testing packages..."
