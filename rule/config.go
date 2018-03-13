@@ -27,7 +27,7 @@ func (e *ErrInvalidRulesFile) Error() string {
 
 // Config get rules from config file
 func Config(path string) (Rules, error) {
-	content, err := ioutil.ReadFile(fmt.Sprintf("%v/.rules.yaml", path))
+	content, err := ioutil.ReadFile(fmt.Sprintf("%v/rules.yaml", path))
 	if err != nil {
 		return nil, &ErrCannotReadRulesFile{err}
 	}
