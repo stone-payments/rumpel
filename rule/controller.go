@@ -71,6 +71,9 @@ func (e *ErrRuleNotFound) Error() string {
 
 func getMatchRuleByClaim(rls Rules, claim *Claim) (*Rule, error) {
 	for _, rl := range rls {
+		if len(rl.Claims) <= 0 {
+			return &rl, nil
+		}
 		if found := rl.MatchByClaim(claim); found {
 			return &rl, nil
 		}
