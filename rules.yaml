@@ -17,9 +17,6 @@
 #     method: POST
 #     headers:
 
-# ---
-# - name: A
-#   url: https://www.stone.com.br
-#   claims:
-#   - host: 127.0.0.1:28080
-#     path: /ab
+---
+- name: A
+  url: https://www.stone.com.br
